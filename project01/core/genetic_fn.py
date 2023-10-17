@@ -5,8 +5,8 @@ import torch.nn as nn
 def cost_function(travel_list, distance_metric):
     total_distance = 0
     for i in range(len(travel_list)-1):
-        total_distance += distance_metric[travel_list[i],travel_list[i+1]]
-    total_distance += distance_metric[-1,0]
+        total_distance += distance_metric[travel_list[i]][travel_list[i+1]]
+    total_distance += distance_metric[travel_list[-1]][travel_list[0]]
     return total_distance
 
 def fitness(travel_list, distance_metric):
@@ -34,9 +34,42 @@ def tournament_selection(population, fitness_value, tournament_size):
 def crossover(arg1, arg2, locus:Optional[int]=None):
     n = len(arg1)
     if locus is None:
-        locus = np.random.randint(n-1)
+        locus = np.random.randint(n)
     child1 = arg1[:locus] + arg2[locus:] 
     child2 = arg2[:locus] + arg1[locus:]
+    return child1, child2
+
+def fixed_crossover(arg1, arg2):
+    assert len(arg1) == len(arg2) , "parents' size should be equal"
+    n = len(arg1)
+    point = np.random.randint(n)
+    child1 = arg2[:point]
+    child2 = arg1[:point]
+    return child1 + [x for x in arg1 if x not in child1] , child2 + [x for x in arg2 if x not in child2]
+
+def fixed_crossover_twopoint(arg1, arg2):
+    assert len(arg1) == len(arg2) , "parents' size should be equal"
+    n = len(arg1)
+    point1 = np.random.randint(n-1)
+    point2 = np.random.choice(range(point1,n+1))
+    child1 = arg2[point1:point2+1]
+    child2 = arg1[point1:point2+1]
+    return child1 + [x for x in arg1 if x not in child1] , child2 + [x for x in arg2 if x not in child2]
+
+def ordered_crossover(parent1, parent2, p1, p2):
+    n = len(parent1)
+    child1 = [-1] * n
+    child2 = [-1] * n
+    
+    child1[p1:p2+1] = parent2[p1:p2+1]
+    child2[p1:p2+1] = parent1[p1:p2+1]
+    
+    remaining1 = [x for x in parent1 if x not in child1]
+    remaining2 = [x for x in parent2 if x not in child2]
+    
+    child1 = [remaining1.pop(0) if x == -1 else x for x in child1]
+    child2 = [remaining2.pop(0) if x == -1 else x for x in child2]
+    
     return child1, child2
 
 def mutate(arg):
@@ -62,7 +95,7 @@ def replace_firstweak(population, candidate, distance_metric):
     pop_temp = population.copy()
     cand_fitness = fitness(candidate, distance_metric)
     for i, pop in enumerate(pop_temp):
-        if cand_fitness >= fitness(pop, distance_metric):
+        if cand_fitness > fitness(pop, distance_metric):
             pop_temp[i] = candidate
     return pop_temp
 
