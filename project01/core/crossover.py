@@ -49,7 +49,31 @@ def ordered_crossover(parent1, parent2):
 
 def partialMap_crossover(parent1, parent2):
     n = len(parent1)
-    point1, point2 = np.sort(np.random.choice(n, 2, replace=False))
+    # point1, point2 = np.sort(np.random.choice(n, 2, replace=False))
+    point1 , point2 = 2,3
+    child1 = [None] * n
+    child2 = [None] * n
 
+    child1[point1:point2+1] = parent2[point1:point2+1]
+    child2[point1:point2+1] = parent1[point1:point2+1]
+
+    for i in range(n):
+        if i in list(range(point1,point2+1)):
+            continue
+        
+        if parent1[i] not in child1:
+            child1[i] = parent1[i]
     
-    pass
+        if parent2[i] not in child2:
+            child2[i] = parent2[i]
+
+    remain1 = [x for x in parent1 if x not in child1]
+    remain2 = [x for x in parent2 if x not in child2]
+    
+    for i in range(n):
+        if child1[i] == None:
+            child1[i] = remain1.pop(0)
+        if child2[i] == None:
+            child2[i] = remain2.pop(0)
+
+    return child1 , child2
