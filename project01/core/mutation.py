@@ -16,17 +16,17 @@ class Mutation:
     def multi_swap(self, candidate):
         pass
 
-def mutate(arg):
-    n = len(arg)
+def mutate(candidate):
+    n = len(candidate)
     if n < 2:
-        return arg
+        return candidate
     idx1, idx2 = np.random.choice(n, size=2, replace=False)
-    res = arg.copy()  
+    res = candidate.copy()  
     res[idx1], res[idx2] = res[idx2], res[idx1]  
     return res
 
-def multiple_mutate(arg, num_mutate:int=2):
-    temp = arg.copy()
+def multiple_mutate(candidate, num_mutate:int=2):
+    temp = candidate.copy()
     for _ in range(num_mutate):
         temp = mutate(temp)
     return temp
