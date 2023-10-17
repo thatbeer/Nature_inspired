@@ -1,6 +1,21 @@
 import torch.nn as nn
 import numpy as np
 
+from core import fitness
+from typing import List
+
+class Chromosome:
+    def __init__(self, genes:List[int], distance_metric=distance_metric):
+        self.genes = genes
+        self.distance_metric = distance_metric
+        self.phenomes = self.__fitness__(genes=genes)
+
+    def __fitness__(self, genes:List[int]) -> int:
+        return fitness(genes, distance_metric=self.distance_metric)
+
+    def __str__(self):
+        return f"Genes: {self.genes}\nPhenomes: {self.phenomes:.5f}"
+
 class TSP_GENETICALGO(nn.Module):
     def __init__(self, distance_metric, population_size:int=10, max_iter:int=100, mutate_rate:float=0.2) -> None:
         super(TSP_GENETICALGO, self).__init__

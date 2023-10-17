@@ -1,5 +1,5 @@
 import numpy as np
-from genetic_fn import fitness
+from .utils import fitness
 
 
 def replace_firstweak(population, candidate, distance_metric):
