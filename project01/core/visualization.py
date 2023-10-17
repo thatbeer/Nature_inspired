@@ -15,7 +15,7 @@ def draw_cost_seperate(upper, avg):
 
 def draw_cost(upper, avg):
     x = list(range(len(upper)))
-    plt.figure(8,8)
+    # plt.figure(8,8)
     plt.plot(x, avg, linestyle='--', color='red')
     plt.plot(x, upper, linestyle='--',color='g',linewidth=2.0)
     plt.title("Experiment1")

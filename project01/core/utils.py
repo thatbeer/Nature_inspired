@@ -13,8 +13,8 @@ def load_metrics(xml_path, info=False):
     doublePrecision = int(root.find('doublePrecision').text)
     ignoredDigits = int(root.find('ignoredDigits').text)
     num_node = len(root.findall(".//vertex"))
-    weights_metric = np.nan_to_num(np.identity(num_node) * -np.inf, 0.0)
-    # weights_metric = np.identity(num_node)
+    # weights_metric = np.nan_to_num(np.identity(num_node) * -np.inf, 0.0)
+    weights_metric = np.zeros(num_node)
 
     for i, vertex in enumerate(root.findall('.//vertex')):
         for edge in vertex.findall('.//edge'):
@@ -58,3 +58,8 @@ def tournament_selection(population, fitness_value, tournament_size):
             res = population[idx]
         
     return res, fit_value
+
+def binary_tournament(population,fitness_value, tournament_size):
+    parent1, _ = tournament_selection(population=population, fitness_value=fitness_value, tournament_size=tournament_size)
+    parent2, _ = tournament_selection(population=population, fitness_value=fitness_value, tournament_size=tournament_size)
+    return parent1 , parent2
