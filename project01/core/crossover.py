@@ -3,6 +3,7 @@ from typing import Optional, List
 
 
 def crossover(parent1, parent2, locus:Optional[int]=None):
+    assert len(parent1) == len(parent2) , "parents' size should be equal"
     n = len(parent1)
     if locus is None:
         locus = np.random.randint(n)
@@ -48,9 +49,9 @@ def ordered_crossover(parent1, parent2):
     return child1 , child2
 
 def partialMap_crossover(parent1, parent2):
+    assert len(parent1) == len(parent2) , "parents' size should be equal"
     n = len(parent1)
-    # point1, point2 = np.sort(np.random.choice(n, 2, replace=False))
-    point1 , point2 = 2,3
+    point1, point2 = np.sort(np.random.choice(n, 2, replace=False)) 
     child1 = [None] * n
     child2 = [None] * n
 
@@ -77,3 +78,4 @@ def partialMap_crossover(parent1, parent2):
             child2[i] = remain2.pop(0)
 
     return child1 , child2
+
