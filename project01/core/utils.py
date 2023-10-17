@@ -1,7 +1,6 @@
 import xml.etree.ElementTree as ET
 import numpy as np
-from typing import Optional, Literal
-from .replacement import replace_firstweak
+import itertools
 
 # function to load weight metrics
 def load_metrics(xml_path, info=False):
@@ -84,3 +83,19 @@ def search(max_gens, pop_size, tour_size, co_fn, mut_fn, replace_fn, distance_me
                 print(f"improve avg fitness from {fit_avg[i-1]} -> {fit_avg[i]}")
 
     return population, pop_fitness , fit_avg, fit_upper
+
+
+def find_combinations(max_generations,population_sizes,tour_size,crossover_functions,mutate_functions,replace_functions):
+    return list(itertools.product(
+    max_generations, population_sizes, tour_size,
+    crossover_functions, mutate_functions, replace_functions
+))
+
+def create_parameter_list(max_generations,population_sizes,tour_size,crossover_functions,mutate_functions,replace_functions):
+    from .classes import Parameters
+    res = []
+    parameter_combinations = find_combinations(max_generations,population_sizes,tour_size,crossover_functions,mutate_functions,replace_functions)
+    for params in parameter_combinations:
+    # print(Parameters(*params))
+        res.append(Parameters(*params))
+    return res
