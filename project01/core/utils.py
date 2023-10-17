@@ -1,6 +1,7 @@
 import xml.etree.ElementTree as ET
 import numpy as np
 from typing import Optional, Literal
+from .replacement import replace_firstweak
 
 # function to load weight metrics
 def load_metrics(xml_path, info=False):
@@ -13,8 +14,8 @@ def load_metrics(xml_path, info=False):
     doublePrecision = int(root.find('doublePrecision').text)
     ignoredDigits = int(root.find('ignoredDigits').text)
     num_node = len(root.findall(".//vertex"))
-    # weights_metric = np.nan_to_num(np.identity(num_node) * -np.inf, 0.0)
-    weights_metric = np.zeros(num_node)
+    weights_metric = np.nan_to_num(np.identity(num_node) * -np.inf, 0.0)
+    # weights_metric = np.identity(num_node)
 
     for i, vertex in enumerate(root.findall('.//vertex')):
         for edge in vertex.findall('.//edge'):
@@ -56,10 +57,30 @@ def tournament_selection(population, fitness_value, tournament_size):
         if new_fit >= fit_value:
             fit_value = new_fit
             res = population[idx]
-        
     return res, fit_value
 
 def binary_tournament(population,fitness_value, tournament_size):
     parent1, _ = tournament_selection(population=population, fitness_value=fitness_value, tournament_size=tournament_size)
     parent2, _ = tournament_selection(population=population, fitness_value=fitness_value, tournament_size=tournament_size)
     return parent1 , parent2
+
+def search(max_gens, pop_size, tour_size, co_fn, mut_fn, replace_fn, distance_metric):
+    population = generate_population(distance_metric=distance_metric, pop_size=pop_size)
+    pop_fitness = [fitness(pop, distance_metric=distance_metric) for pop in population]
+    fit_avg = [np.mean(pop_fitness)]
+    fit_upper = [np.max(pop_fitness)]
+    for i in range(max_gens):
+        # parent1 = tournament_selection(population=population, fitness_value=pop_fitness, tournament_size=tour_size)
+        parent1, parent2 = binary_tournament(population=population, fitness_value=pop_fitness, tournament_size=tour_size)
+        child1 , child2 = co_fn(parent1=parent1, parent2=parent2)
+        child1 , child2 = mut_fn(child1) , mut_fn(child2)
+        population = replace_fn(population=population,candidate=child1,distance_metric=distance_metric)
+        population = replace_fn(population=population,candidate=child2,distance_metric=distance_metric)
+        pop_fitness = [fitness(pop, distance_metric=distance_metric) for pop in population]
+        fit_avg.append(np.mean(pop_fitness))
+        fit_upper.append(np.max(pop_fitness))
+        if i > 2:
+            if fit_avg[i] - fit_avg[i-1]:
+                print(f"improve avg fitness from {fit_avg[i-1]} -> {fit_avg[i]}")
+
+    return population, pop_fitness , fit_avg, fit_upper

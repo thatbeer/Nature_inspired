@@ -12,13 +12,39 @@ def crossover(parent1, parent2, locus:Optional[int]=None):
     assert (len(set(child1)) == n ) and (len(set(child2)) == n ) , "found duplicated node inside child"
     return child1, child2
 
-def fixed_crossover(parent1, parent2):
-    assert len(parent1) == len(parent2) , "parents' size should be equal"
-    n = len(parent1)
+# def fixed_crossover(parent1, parent2):
+#     assert len(parent1) == len(parent2) , "parents' size should be equal"
+#     n = len(parent1)
+#     point = np.random.randint(n)
+#     child1 = parent2[:point]
+#     child2 = parent1[:point]
+#     return child1 + [x for x in parent1 if x not in child1] , child2 + [x for x in parent2 if x not in child2]
+
+def fixed_crossover(arg1, arg2):
+    assert len(arg1) == len(arg2) , "parents' size should be equal"
+    n = len(arg1)
     point = np.random.randint(n)
-    child1 = parent2[:point]
-    child2 = parent1[:point]
-    return child1 + [x for x in parent1 if x not in child1] , child2 + [x for x in parent2 if x not in child2]
+    # point = 3
+    child1 = [None] * n
+    child2 = [None] * n
+    child1[point:] = arg2[point:]
+    child2[point:] = arg1[point:]
+
+    for i in range(point):
+        if arg1[i] not in child1:
+            child1[i] = arg1[i]
+        if arg2[i] not in child2:
+            child2[i] = arg2[i]
+
+    remain1 = [x for x in arg1 if x not in child1]
+    remain2 = [x for x in arg2 if x not in child2]
+    
+    for i in range(n):
+        if child1[i] == None:
+            child1[i] = remain1.pop(0)
+        if child2[i] == None:
+            child2[i] = remain2.pop(0)
+    return child1 , child2
 
 def fixed_crossover_twopoint(parent1, parent2):
     assert len(parent1) == len(parent2) , "parents' size should be equal"
