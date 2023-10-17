@@ -12,17 +12,23 @@ class Parameters:
     mutate_fn : Callable
     replace_fn : Callable
 
+@dataclass
 class Chromosome:
-    def __init__(self, genes:List[int], distance_metric):
-        self.distance_metric = distance_metric
-        self.genes = genes
-        self.phenomes = self.__fitness__(genes=genes)
+    gene : List[int]
+    phenome : float
 
-    def __fitness__(self, genes:List[int]) -> int:
-        return fitness(genes, distance_metric=self.distance_metric)
+## OLD CLASS
+# class Chromosome:
+#     def __init__(self, genes:List[int], distance_metric):
+#         self.distance_metric = distance_metric
+#         self.genes = genes
+#         self.phenomes = self.__fitness__(genes=genes)
 
-    def __str__(self):
-        return f"Genes: {self.genes}\nPhenomes: {self.phenomes:.5f}"
+#     def __fitness__(self, genes:List[int]) -> int:
+#         return fitness(genes, distance_metric=self.distance_metric)
+
+#     def __str__(self):
+#         return f"Genes: {self.genes}\nPhenomes: {self.phenomes:.5f}"
 
 class Genetic(nn.Module):
     def __init__(self, distance_metric, p_mutate, p_crossover) -> None:

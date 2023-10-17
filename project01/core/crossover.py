@@ -66,6 +66,14 @@ def ordered_crossover(parent1, parent2):
     child1[start:end+1] = parent2[start:end+1]
     child2[start:end+1] = parent1[start:end+1]
 
+    mapping_range = list(set(range(n)) - set(range(start,end+1)))
+    for idx in mapping_range:
+            if parent1[idx] not in child1:
+                child1[idx] = parent1[idx]
+            if parent2[idx] not in child2:
+                child2[idx] = parent2[idx]
+
+
     remain1 = [x for x in parent1 if x not in child1]
     remain2 = [x for x in parent2 if x not in child2]
 
