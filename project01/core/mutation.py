@@ -16,5 +16,3 @@ class Mutation:
     def multi_swap(self, candidate):
         pass
 
-def 
-    
