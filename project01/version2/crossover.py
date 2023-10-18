@@ -117,3 +117,6 @@ def partialmap_crossover(parent1:Chromosome, parent2:Chromosome) -> List[int]:
             child2[i] = remain2.pop(0)
     
     return child1 , child2
+
+def no_crossover(parent1:Chromosome, parent2:Chromosome) -> List[int]:
+    return parent1.gene, parent2.gene
