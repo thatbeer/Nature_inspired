@@ -7,8 +7,9 @@ def replace_firstweak(population:List[Chromosome],
                     inplace=False) -> List[Chromosome]:
     pop_temp = population.copy()
     for i, pop in enumerate(pop_temp):
-        if candidate.phenome > pop[i].phenome:
-            pop[i] = candidate
+        if candidate.phenome > pop.phenome:
+            pop_temp[i] = candidate
+            return pop_temp
     return pop_temp
 
 def replace_weakest(population:List[Chromosome],

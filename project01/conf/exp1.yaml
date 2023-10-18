@@ -1,0 +1,8 @@
+name: experiment01
+experiment:
+  max_generations: 100
+  population_size: 50
+  tournament_size: 5
+  crossover_function: mutate
+  mutate_function: ???
+  replacement_function: ???

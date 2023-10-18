@@ -41,18 +41,6 @@ def cost_function(gene:List[int],distance_metric:List[List[int]]) -> float:
 def fitness_function(gene:List[int], distance_metric:List[List[int]]) -> float:
     return 1.0 / cost_function(gene, distance_metric)
 
-def find_combinations(max_generations,population_sizes,tour_size,crossover_functions,mutate_functions,replace_functions):
-    return list(itertools.product(
-    max_generations, population_sizes, tour_size,
-    crossover_functions, mutate_functions, replace_functions
-))
-
-def create_parameter_list(max_generations,population_sizes,tour_size,crossover_functions,mutate_functions,replace_functions) -> List[Parameters]:
-    res = []
-    parameter_combinations = find_combinations(max_generations,population_sizes,tour_size,crossover_functions,mutate_functions,replace_functions)
-    for params in parameter_combinations:
-        res.append(Parameters(*params))
-    return res
 
 def create_gene(distance_metric:List[List[int]]) -> List[int]:
     return list(np.random.permutation(len(distance_metric)))
@@ -94,3 +82,16 @@ def pop_stats(population:List[Chromosome]) -> (float,(int,float)):
     avg = np.mean(phenomes_list)
     max_idx = np.argmax(phenomes_list)
     return avg , (max_idx, phenomes_list[max_idx])
+
+def find_combinations(max_generations,population_sizes,tour_size,crossover_functions,mutate_functions,replace_functions):
+    return list(itertools.product(
+    max_generations, population_sizes, tour_size,
+    crossover_functions, mutate_functions, replace_functions
+))
+
+def create_parameter_list(combinations) -> List[Parameters]:
+    res = []
+    # parameter_combinations = find_combinations(max_generations,population_sizes,tour_size,crossover_functions,mutate_functions,replace_functions)
+    for params in combinations:
+        res.append(Parameters(*params))
+    return res
