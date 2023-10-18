@@ -3,7 +3,7 @@ import numpy as np
 
 from dataclasses import dataclass
 from typing import Optional, Literal, Callable, List
-# from .utils import fitness_function, create_gene
+# from .utils import fitness_function, create_gene, create_chromosome
 
 
 @dataclass
@@ -18,7 +18,11 @@ class Parameters:
 @dataclass
 class Chromosome:
     gene : List[int]
-    phenome : float
+    phenome : float 
+    length : int = 0
+
+    def __post_init__(self):
+        self.length = len(self.gene)
 
 # class Genetic(nn.Module):
 #     def __init__(self, distance_metric, p_mutate, p_crossover) -> None:
@@ -49,10 +53,12 @@ class Chromosome:
 #             res.append(temp)
         
 #         return res
+    # def crossover(self,cross_fn):
+    #     return create_gene(cross_fn(parent1,parent2))
 
         
     
-#     def search(self,cfg):
+    # def search(self,cfg):
 #         # TODO : make search return everything we need to track upon experiencing the lab
 #         pass
 
