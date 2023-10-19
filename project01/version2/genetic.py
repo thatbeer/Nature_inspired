@@ -1,6 +1,37 @@
 from typing import List, Any, Callable
+from . import best_gene, generate_population, parents_selection, create_chromosome, pop_stats, Chromosome
 import numpy as np
-from . import best_gene, generate_population, parents_selection, create_chromosome, pop_stats
+import torch.nn as nn
+
+class Fitness(nn.Module):
+    def __init__(self, distance_metric) -> None:
+        super().__init__()
+        self.distance_metric = distance_metric
+    
+    def forward(self, gene:List[int]) -> Chromosome:
+        pass
+
+class Mutate(nn.Module):
+    def __init__(self, distance_metric) -> None:
+        super().__init__()
+        self.fitness_fn = Fitness(distance_metric=distance_metric)
+    
+    def forward(self, gene:Chromosome) -> Chromosome:
+        pass
+
+class Crossover(nn.Module):
+    def __init__(self, distance_metric) -> None:
+        super().__init__()
+        self.fitness_fn = Fitness(distance_metric=distance_metric)
+        
+    def forward(self, parents: List[Chromosome]) -> List[Chromosome]:
+        pass
+
+class Genetic:
+    def __init__(self, distance_metric) -> None:
+        self.distance_metric = distance_metric
+        self.chromosome = Chromosome()
+
 
 def search(distance_metric: List[List[int]],
         max_gens:int,

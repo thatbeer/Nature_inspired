@@ -23,6 +23,15 @@ class Chromosome:
 
     def __post_init__(self):
         self.length = len(self.gene)
+        ## TODO : create a post initial for calculate fitness value
+
+class Fitness(nn.Module):
+    def __init__(self, distance_metric) -> None:
+        super().__init__()
+        self.distance_metric = distance_metric
+    
+    def forward(self, gene:List[int]) -> Chromosome:
+        pass
 
 # class Genetic(nn.Module):
 #     def __init__(self, distance_metric, p_mutate, p_crossover) -> None:
