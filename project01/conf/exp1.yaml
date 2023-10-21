@@ -1,8 +1,9 @@
 name: experiment01
-experiment:
+num_trial: 100
+parameters:
   max_generations: 100
   population_size: 50
   tournament_size: 5
-  crossover_function: mutate
-  mutate_function: ???
-  replacement_function: ???
+  crossover_function: ordered_crossover
+  mutate_function: mutate
+  replacement_function: replace_weakest

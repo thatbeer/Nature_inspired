@@ -2,6 +2,7 @@ import numpy as np
 import torch.nn as nn
 # from . import Chromosome, Fitness
 from typing import List, Any, Callable
+from dataclasses import dataclass
 
 @dataclass
 class Chromosome:
@@ -12,7 +13,7 @@ class Chromosome:
     def __post_init__(self):
         self.length = len(self.gene)
         ## TODO : create a post initial for calculate fitness value
-        self.phenome = fitness
+        # self.phenome = fitness
 
 class Mutate(nn.Module):
     def __init__(self, distance_metric) -> None:
