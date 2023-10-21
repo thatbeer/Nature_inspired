@@ -1,0 +1,16 @@
+## please provide a full path of the dataset.
+name: test_template
+path: D:\USERS\Exeter\Courses\Module ECMM409 (2023) Nature-Inspired Computation\Nature_inspired\project01.1\data\burma14.xml
+file_name: burma_exp02
+num_trial: 100
+parameters:
+  max_generations: 1000
+  population_size: 100
+  tournament_size: 10
+  p_select: 0.7
+  p_crossover: 0.9
+  p_mutate: 0.2
+functions:
+  crossover_fn: partialmap_crossover
+  mutate_fn: inversion
+  replace_fn: replace_weakest

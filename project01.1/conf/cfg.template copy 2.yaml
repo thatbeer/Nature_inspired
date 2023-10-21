@@ -1,6 +1,8 @@
 ## please provide a full path of the dataset.
+name: test_template
 path: D:\USERS\Exeter\Courses\Module ECMM409 (2023) Nature-Inspired Computation\Nature_inspired\project01.1\data\burma14.xml
-num_trial: 10
+file_name: burma_01
+num_trial: 5
 parameters:
   max_generations: 500
   population_size: 100

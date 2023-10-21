@@ -10,14 +10,18 @@ class Parameters:
     p_select:float
     p_crossover:float
     p_mutate:0.2
+
 @dataclass
 class Functions:
     crossover_fn: Callable
     mutate_fn: Callable
     replace_fn: Callable
 @dataclass
+
 class Config:
+    name : str
     path : str
+    file_name : str
     num_trial: 10
     parameters: Parameters
     functions: Functions
@@ -45,14 +49,36 @@ class Population:
         self.avg_fitness = np.mean([x.phenome for x in self.pop])
 
 @dataclass
+class SimpleLog:
+    best_gene: Chromosome
+    best_fitness : float
+    avg_fitness: float
+
+@dataclass
 class Log:
-    best_gene: List[Chromosome]
+    best_gene: Chromosome
     best_fitness : List[float]
     avg_fitness: List[float]
     first_generation: List[Chromosome]
     last_generation: List[Chromosome]
     generations: List[List[Chromosome]]
-    
 
+@dataclass
+class AdvanceLog:
+    gens : int
+    best_fitness : float
+    avg_fitness : float
+    best_gene : List[int]
+
+@dataclass
+class TriaLog:
+    trial : int
+    information : Log | SimpleLog
+    # avg_best_fitness : float = 0
+
+    # def __post_init__(self):
+    #     if self.trial > 1:
+    #         self.avg_best_fitness = np.mean(self.information.best_fitness)
+    
 
     

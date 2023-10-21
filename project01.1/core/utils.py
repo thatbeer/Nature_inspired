@@ -1,7 +1,9 @@
 import xml.etree.ElementTree as ET
 import itertools
 import numpy as np  
+import yaml
 from typing import List
+from .dataclass import Config, Parameters, Functions
 
 
 
@@ -56,3 +58,16 @@ def find_combinations(max_generations,population_sizes,tour_size,crossover_funct
 #     for params in combinations:
 #         res.append(Parameters(*params))
 #     return res
+
+def load_yaml(path):
+    with open(path,"r") as config_file:
+        config_data = yaml.safe_load(config_file)
+    cfg = Config(
+        name=config_data["name"],
+        path=config_data["path"],
+        file_name= config_data["file_name"],
+        num_trial=config_data["num_trial"],
+        parameters=Parameters(**config_data["parameters"]),
+        functions=Functions(**config_data["functions"])
+    )
+    return cfg
