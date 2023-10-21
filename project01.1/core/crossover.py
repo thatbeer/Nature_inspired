@@ -79,10 +79,10 @@ def partialmap_crossover(parent1:Chromosome, parent2:Chromosome, p_crossover:flo
         if i in list(range(start,end+1)):
             continue
     
-        if parent1[i] not in child1:
+        if parent1.gene[i] not in child1:
             child1[i] = parent1.gene[i]
         
-        if parent2[i] not in child2:
+        if parent2.gene[i] not in child2:
             child2[i] = parent2.gene[i]
     
     remain1 = [x for x in parent1.gene if x not in child1]
