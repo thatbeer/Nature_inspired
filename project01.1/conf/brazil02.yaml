@@ -11,6 +11,6 @@ parameters:
   p_crossover: 0.9
   p_mutate: 0.2
 functions:
-  crossover_fn: ordered_crossover
+  crossover_fn: partialmap_crossover
   mutate_fn: inversion
   replace_fn: replace_weakest

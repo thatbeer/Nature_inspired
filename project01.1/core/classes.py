@@ -51,13 +51,13 @@ class GeneticAlgorithm(nn.Module):
             distance_metric=self.distance_metric
         )
 
-    def _create_chromosome(self, gene):
+    def _create_chromosome(self, gene : List[int]) -> Chromosome:
         return create_chromosome(gene=gene,distance_metric=self.distance_metric)
     
-    def _mutate(self, gene):
+    def _mutate(self, gene : Chromosome) -> List[int]:
         return self.mutate(gene, self.params.p_mutate)
     
-    def _crossover(self, parent1, parent2):
+    def _crossover(self, parent1, parent2) -> List[List[int]]:
         return self.crossover(parent1, parent2, self.params.p_crossover)
 
     def _replacement(self, population, candidate):
@@ -78,16 +78,17 @@ class GeneticAlgorithm(nn.Module):
 
         return population, best_one
 
+    # evolve forward one generation x -> x + 1
     def evolve(self, population_origin):
         populationx = population_origin.copy()
         parents = parents_selection(population=populationx,
                                     tournament_size=self.params.tournament_size)
         gene1, gene2 = self._crossover(parents[0], parents[1])
+        # child1, child2 = self._create_chromosome(gene1), self._create_chromosome(gene2)
+        gene1, gene2 = self._mutate(gene1), self._mutate(gene2)
         child1, child2 = self._create_chromosome(gene1), self._create_chromosome(gene2)
-        child1, child2 = self._mutate(child1), self._mutate(child2)
         for child in [child1,child2]:
-            populationx = self._replacement(population=populationx,
-                                                  candidate=child)
+            populationx = self._replacement(population=populationx,candidate=child)
         return populationx
     
 
@@ -140,7 +141,7 @@ class SoleExp:
             "best_gene" : [x.best_gene for x in self.experiment]
         }
         parents , _ = self.config.file_name.split('_')
-        path_file = f'dest/{parents}/{self.config.file_name}.csv'
+        path_file = f'dest/{parents}/{self.config.name}.csv'
         df = pd.DataFrame(di)
         df.to_csv(path_file, index=False)
         return df
@@ -197,8 +198,9 @@ class Speculator:
             "times" : self.time
         }
         parent, name = self.config.file_name.split("_")
+        top_name = self.config.name
         df = pd.DataFrame(data)
-        df.to_csv(f'dst/{parent}/{name}.csv',index=False)
+        df.to_csv(f'dst/{parent}/{top_name}.csv',index=False)
         self.clear
         return df
 

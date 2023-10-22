@@ -2,7 +2,7 @@
 name: test_template
 path: D:\USERS\Exeter\Courses\Module ECMM409 (2023) Nature-Inspired Computation\Nature_inspired\project01.1\data\brazil58.xml
 file_name: brazil_exp01
-num_trial: 10
+num_trial: 1000
 parameters:
   max_generations: 500
   population_size: 100
@@ -11,6 +11,6 @@ parameters:
   p_crossover: 0.9
   p_mutate: 0.2
 functions:
-  crossover_fn: ordered_crossover
+  crossover_fn: point_crossover
   mutate_fn: inversion
   replace_fn: replace_weakest
