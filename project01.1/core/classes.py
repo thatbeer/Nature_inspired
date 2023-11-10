@@ -25,7 +25,6 @@ def load_fn(fn_name):
         "replace_firstweak": replace_firstweak,
         "replace_weakest": replace_weakest
     }
-    
     # Check if the provided function name is in the dictionary
     if fn_name in functions:
         return functions[fn_name]
@@ -231,6 +230,7 @@ class Speculator:
                     pass
 
     def advance_run(self):
+        gen2log = [100,200,300,500,800,1000]
         for trial in range(self.config.num_trial):
             log = Log(
                 best_gene=[],
@@ -264,6 +264,8 @@ class Speculator:
 
                 if i + 1 == self.config.parameters.max_generations:
                     log.last_generation.append(population)
+                if i in gen2log:
+                    pass
             
             self.experiment.append(TriaLog(trial+1, log))
             

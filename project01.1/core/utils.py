@@ -5,7 +5,19 @@ import yaml
 from typing import List
 from .dataclass import Config, Parameters, Functions
 
+def create_config(name, path, file_name, num_trial, parameters, functions):
+    # Assuming parameters and functions are dictionaries
+    parameters_obj = Parameters(**parameters)
+    functions_obj = Functions(**functions)
 
+    return Config(
+        name=name,
+        path=path,
+        file_name=file_name,
+        num_trial=num_trial, # ignored by Sole_Exp
+        parameters=parameters_obj,
+        functions=functions_obj
+    )
 
 def load_metrics(xml_path, info=False) -> List[List[int]]:
     tree = ET.parse(xml_path)

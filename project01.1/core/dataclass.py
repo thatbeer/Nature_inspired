@@ -69,6 +69,10 @@ class AdvanceLog:
     best_fitness : float
     avg_fitness : float
     best_gene : List[int]
+@dataclass
+class GenerationLog:
+    gens : int # 100 , 200 , 300 , 500 , 800 , 1000
+
 
 @dataclass
 class TriaLog:
