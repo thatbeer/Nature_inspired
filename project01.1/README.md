@@ -4,6 +4,22 @@
 This repository contains implementations related to genetic algorithms for solving optimization problems and tracking the experiment for individual report for Nature-inspired class.
 
 
+## Experimental notebook
+
+### mut_exp.ipynb
+- the notebook is used to run experiment to understand and get the insight of how each mutation operator affect the model performance
+
+### co_exp.ipynb
+- the notebook is used to run experiment to understand and get the insight of how each crossover operator affect the model performance
+
+### params_exp.ipynb
+- the notebook is used to run experiment to understand and the insight of how different parameters affect the model performance.
+
+### performance_exp.ipynb
+- the notebook is also used to run experiemnt to understand how diffrent parameters affect the model performance with utilize function to run experiment and visualize the illustration.
+
+
+
 ## File Overview and Function Descriptions
 
 ### ./run.py
@@ -26,6 +42,7 @@ This repository contains implementations related to genetic algorithms for solvi
   - `load_fn(fn_name: str) -> Callable`: Loads specific functions based on their names.
 - **Classes**:
   - `GeneticAlgorithm`: Represents the genetic algorithm with various attributes and methods.
+  it also presents the function to operate evolve from generation to the next generation and forward function that return the result of the whole genetic algorithm.
   - `SoleExp`: Represents the Experimental logger class to track the performance of each genetic generations. and save the data into csv file.
   - `Speculator`: Represents the Experimental logger class to track the performance of the trial that performs the each genetic algorithm and save the data into csv file.
 
@@ -70,6 +87,9 @@ This repository contains implementations related to genetic algorithms for solvi
   - `pop_stats(population:List[List[int]]) -> (float,(int,float))`: Returns statistical values for a population.
   - `find_combinations(...) -> List[Tuple[Any, ...]]`: Returns all combinations of provided parameters.
   - `load_yaml(path) -> Config`: Loads configuration details from a YAML file.
+
+### core/search.py
+- contains the utilization function to run the genetic algorithm experiment for maximum 1000 generation, 3000 generation, and 5000 generation with the visualization function.
 
 ## @ `conf` directory
 -  contains yaml configuration files for logging with SoleExp and Speculator class. visit `conf/exp1.template.yaml` to observe how the conf is structred/

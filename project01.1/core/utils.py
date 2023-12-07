@@ -5,6 +5,7 @@ import yaml
 from typing import List
 from .dataclass import Config, Parameters, Functions
 
+# utilize function to creaete configuration without generating yaml file.
 def create_config(name, path, file_name, num_trial, parameters, functions):
     # Assuming parameters and functions are dictionaries
     parameters_obj = Parameters(**parameters)
@@ -41,6 +42,7 @@ def load_metrics(xml_path, info=False) -> List[List[int]]:
 
     return weights_metric
 
+# calculate the total distance in each path solution
 def cost_function(gene:List[int],distance_metric:List[List[int]]) -> float:
     total_distance = 0
     for i in range(len(gene)-1):
@@ -48,6 +50,7 @@ def cost_function(gene:List[int],distance_metric:List[List[int]]) -> float:
     total_distance += distance_metric[gene[-1]][gene[0]]
     return total_distance
 
+# evluate fitness value from total cost distance.
 def fitness_function(gene:List[int], distance_metric:List[List[int]]) -> float:
     return 1.0 / cost_function(gene, distance_metric)
 
@@ -71,6 +74,7 @@ def find_combinations(max_generations,population_sizes,tour_size,crossover_funct
 #         res.append(Parameters(*params))
 #     return res
 
+# utilize function to load yaml file to configuration setting
 def load_yaml(path):
     with open(path,"r") as config_file:
         config_data = yaml.safe_load(config_file)

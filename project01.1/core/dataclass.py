@@ -16,8 +16,8 @@ class Functions:
     crossover_fn: Callable
     mutate_fn: Callable
     replace_fn: Callable
+    
 @dataclass
-
 class Config:
     name : str
     path : str

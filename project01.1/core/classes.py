@@ -12,6 +12,7 @@ from core.selection import create_chromosome, parents_selection, generate_popula
 from core.dataclass import *
 
 def load_fn(fn_name):
+    # utilize function to called function through configuration
     # Use a dictionary to map function names to their corresponding functions
     functions = {
         "mutate": mutate,
@@ -32,6 +33,8 @@ def load_fn(fn_name):
         raise FileNotFoundError("Are you sure that you named a correct function?")
 
 class GeneticAlgorithm(nn.Module):
+    # genetic algorithm classess which recieves configuration and set them for the certain instances.
+    # the core function of the class is evolve which represent the proces of the genetic algorithm in each generation.
     def __init__(self, config) -> None:
         super(GeneticAlgorithm, self).__init__()
         self.distance_metric = load_metrics(config.path)
@@ -43,7 +46,7 @@ class GeneticAlgorithm(nn.Module):
         self.replacement = load_fn(config.functions.replace_fn)
         self.population = self._generate_population()
         self.experiment_log = config.name
-    
+    # helper function to generate initial population
     def _generate_population(self):
         return generate_population(
             population_size=self.params.population_size,
@@ -62,36 +65,45 @@ class GeneticAlgorithm(nn.Module):
     def _replacement(self, population, candidate):
         return self.replacement(population, candidate)
     
+    # perform genetic algorithm for max_gen iterations.
     def forward(self):
         # population = generate_population(
         #     population_size=self.params.population_size,
         #     distance_metric=self.distance_metric
         # )
+        # initial pop
         population = self.population
         best_one = best_gene(population=population)
         for _ in range(self.params.max_generations):
+            # generate new population
             population = self.evolve(population_origin=population)
             new_best = best_gene(population)
+            # evaluate
             if new_best.phenome > best_one.phenome:
                 best_one = new_best
 
         return population, best_one
 
     # evolve forward one generation x -> x + 1
-    def evolve(self, population_origin):
+    def evolve(self, population_origin): # return next new population
         populationx = population_origin.copy()
+        # perfrom tournament selection
         parents = parents_selection(population=populationx,
                                     tournament_size=self.params.tournament_size)
+        # perform crossover
         gene1, gene2 = self._crossover(parents[0], parents[1])
         # child1, child2 = self._create_chromosome(gene1), self._create_chromosome(gene2)
+        # perform mutation
         gene1, gene2 = self._mutate(gene1), self._mutate(gene2)
         child1, child2 = self._create_chromosome(gene1), self._create_chromosome(gene2)
+        # perform replacement function
         for child in [child1,child2]:
             populationx = self._replacement(population=populationx,candidate=child)
         return populationx
     
 
 class SoleExp:
+    # class to perform experiment to trach the pattern for max_generation
     def __init__(self, config : Config) -> None:
         self.config = config
         self.experiment = {
@@ -102,36 +114,27 @@ class SoleExp:
         }
         self.name = config.name
         self.clear = self._clear_log()
-
+    # perform searching and collect the data into the log
     def run(self):
         ga = GeneticAlgorithm(self.config)
         population = ga._generate_population()
         best = best_gene(population)
         for g in range(self.config.parameters.max_generations):
-            # log = AdvanceLog(
-            #     gens=[],
-            #     best_fitness=[],
-            #     avg_fitness=[],
-            #     best_gene=best
-            # )
             population = ga.evolve(
                 population_origin=population
             )
             new_best = best_gene(population=population)
             if new_best.phenome > best.phenome:
                 best = new_best
+            # collect the generation's information into the log
             log = AdvanceLog(
                 gens=g+1,
                 best_fitness=new_best.phenome,
                 avg_fitness=get_mean(population),
                 best_gene=best.gene
             )
-            # log.gens.append(g+1)
-            # log.best_fitness.append(new_best.phenome)
-            # log.avg_fitness.append(get_mean(population))
-            # log.best_gene = best
             self.experiment.append(log)
-    
+    # save file into csv format and return it as a pandas dataframe
     def save_csv(self):
         di = {
             "gens" : [x.gens for x in self.experiment],
@@ -149,6 +152,7 @@ class SoleExp:
         self.experiment = []
     
 class Speculator:
+    # class to speculate and gather data via multiple trial of genetic algorithm.
     def __init__(self, config: Config) -> None:
         self.config = config
         self.experiment : List[TriaLog] = []
@@ -169,23 +173,20 @@ class Speculator:
         for trial in range(self.config.num_trial):
             # clear the log at the beginning of each trial
             start_time = time.time()
-            # seed = self.random_seed
-            # self.seeds.append(seed)
-            # np.random.seed(seed)
             log = SimpleLog(
                 None,
                 0,
                 0
             )
             ga = GeneticAlgorithm(self.config)
-            last_pop, best_gene = ga.forward()
+            last_pop, best_gene = ga.forward() # run evolve max_gen times
             log.best_gene = best_gene.gene
             log.best_fitness = best_gene.phenome
             log.avg_fitness = get_mean(last_pop)
             end_time = time.time()
             self.time.append(end_time-start_time)
             self.experiment.append(TriaLog(trial+1, log))
-    
+    # save file in csv format and return it as pandas dataframe
     def save_csv(self):
         data = {
             "trial" : [x.trial for x in self.experiment],
@@ -202,32 +203,32 @@ class Speculator:
         df.to_csv(f'dst/{parent}/{top_name}.csv',index=False)
         self.clear
         return df
-
-    def developing_save_csv(self):
-        data = {
-            "trial": [x.trial for x in self.experiment],
-            "best_gene": [],
-            "best_fitness": [],
-            "avg_fitness": [],
-            # "avg_best_fitness": [],
-            "times": self.time
-        }
-        for tria_log in self.experiment:
-            information = tria_log.information
-            match information:
-                case Log(best_gene, best_fitness, avg_fitness, _, _, _):
-                    data["best_gene"].append(best_gene)
-                    data["best_fitness"].append(best_fitness)
-                    data["avg_fitness"].append(avg_fitness)
-                    # data["avg_best_fitness"].append(tria_log.avg_best_fitness)
-                case SimpleLog(best_gene, best_fitness, avg_fitness):
-                    data["best_gene"].append(best_gene)
-                    data["best_fitness"].append(best_fitness)
-                    data["avg_fitness"].append(avg_fitness)
-                    # data["avg_best_fitness"].append(tria_log.avg_best_fitness)
-                case _:
-                    # Handle other classes or raise an error if needed
-                    pass
+    # DID  NOT USE
+    # def developing_save_csv(self):
+    #     data = {
+    #         "trial": [x.trial for x in self.experiment],
+    #         "best_gene": [],
+    #         "best_fitness": [],
+    #         "avg_fitness": [],
+    #         # "avg_best_fitness": [],
+    #         "times": self.time
+    #     }
+    #     for tria_log in self.experiment:
+    #         information = tria_log.information
+    #         match information:
+    #             case Log(best_gene, best_fitness, avg_fitness, _, _, _):
+    #                 data["best_gene"].append(best_gene)
+    #                 data["best_fitness"].append(best_fitness)
+    #                 data["avg_fitness"].append(avg_fitness)
+    #                 # data["avg_best_fitness"].append(tria_log.avg_best_fitness)
+    #             case SimpleLog(best_gene, best_fitness, avg_fitness):
+    #                 data["best_gene"].append(best_gene)
+    #                 data["best_fitness"].append(best_fitness)
+    #                 data["avg_fitness"].append(avg_fitness)
+    #                 # data["avg_best_fitness"].append(tria_log.avg_best_fitness)
+    #             case _:
+    #                 # Handle other classes or raise an error if needed
+    #                 pass
 
     def advance_run(self):
         gen2log = [100,200,300,500,800,1000]
@@ -269,35 +270,3 @@ class Speculator:
             
             self.experiment.append(TriaLog(trial+1, log))
             
-            ## Save the log of each trials
-    
-    # def simple_run(self):
-    #     """Run GA experiments and log data."""
-    #     for trial in range(self.config.num_trial):
-    #         # clear the log at the beginning of each trial
-    #         log = Log(
-    #             best_gene=[],
-    #             best_fitness=[],
-    #             avg_fitness=[],
-    #             first_generation=[],
-    #             last_generation=[],
-    #             generations=[]
-    #         )
-    #         ga = GeneticAlgorithm(self.config)
-    #         last_pop, best_gene = ga.forward()
-    #         log.best_gene.append(best_gene.gene)
-    #         log.best_fitness.append(best_gene.phenome)
-    #         log.first_generation.append(ga.population)
-    #         log.last_generation.append(last_pop)
-    #         self.experiment.append(TriaLog(trial+1, log))
-    
-
-    # def save_to_file(self, path):
-    #     """Save log data to a JSON file."""
-    #     filename = f"{path}/{self.experiment_log}.json"
-    #     with open(filename, 'w') as f:
-    #         # Convert dataclass objects to dictionaries using asdict
-    #         json_data = [asdict(trial_log) for trial_log in self.experiment]
-    #         json.dump(json_data, f, indent=4)
-    
-
