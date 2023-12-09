@@ -1,11 +1,14 @@
+import numpy as np
 import pandas as pd
 import numpy as np
-import random
 import math
-import time
 
+
+from typing import List, Tuple
 from dataclasses import dataclass
-from typing import Any, List, Tuple, Dict
+
+pbest_prob = 0.7
+gbest_prob = 0.9
 
 
 @dataclass
@@ -138,3 +141,87 @@ def calculate_time_and_profit(solution: List[int], plan: List[int], nodes: List[
 
 
     return total_time, total_profit
+
+
+@dataclass
+class Fitness:
+    time: float
+    profit: float
+    net_profit: float
+
+@dataclass
+class Particle:
+    data: TTP
+    path: List[int]
+    plan: List[int]
+    current_score: Fitness = None
+    velocity: List = None
+    personal_best_path: List[int] = None
+    personal_best_plan: List[int] = None
+    personal_best_score: Fitness = None
+
+    def __post_init__(self):
+        self.velocity = self.velocity if self.velocity is not None else []
+        self.current_score = self.calculate_score()
+        self.personal_best_path = self.path.copy()
+        self.personal_best_plan = self.plan.copy()
+        self.personal_best_score = self.current_score
+
+    def calculate_score(self):
+        time, profit = calculate_time_and_profit(self.path, self.plan, self.data.NODE, self.data.ITEM, self.data.MIN_SPEED, self.data.MAX_SPEED, self.data.CAPACITY)
+        net_profit = profit - (self.data.RENTING_RATIO * time)
+        return Fitness(time, profit, net_profit)
+
+    def update_personal_best(self):
+        self.current_score = self.calculate_score()
+        if self.current_score.net_profit > self.personal_best_score.net_profit:
+            self.personal_best_path = self.path.copy()
+            self.personal_best_plan = self.plan.copy()
+            self.personal_best_score = self.current_score
+
+    def update_velocity(self, global_best_particle):
+        # Simple velocity update logic (can be enhanced for better performance)
+        for i in range(len(self.path)):
+            if np.random.rand() < pbest_prob and self.path[i] != self.personal_best_path[i]:
+                self.velocity.append(('path', i, self.personal_best_path.index(self.path[i])))
+            if np.random.rand() < gbest_prob and self.path[i] != global_best_particle.path[i]:
+                self.velocity.append(('path', i, global_best_particle.path.index(self.path[i])))
+        
+        for i in range(len(self.plan)):
+            if np.random.rand() < pbest_prob and self.plan[i] != self.personal_best_plan[i]:
+                self.velocity.append(('plan', i, self.personal_best_plan.index(self.plan[i])))
+            if np.random.rand() < gbest_prob and self.plan[i] != global_best_particle.plan[i]:
+                self.velocity.append(('plan', i, global_best_particle.plan.index(self.plan[i])))
+
+    def apply_velocity(self):
+        for change in self.velocity:
+            if change[0] == 'path':
+                self.path[change[1]], self.path[change[2]] = self.path[change[2]], self.path[change[1]]
+            elif change[0] == 'plan':
+                self.plan[change[1]], self.plan[change[2]] = self.plan[change[2]], self.plan[change[1]]
+
+    def clear_velocity(self):
+        self.velocity.clear()
+
+class PSO:
+    def __init__(self, data, num_particles, iterations, gbest_prob=1.0, pbest_prob=1.0):
+        self.data = data
+        self.num_particles = num_particles
+        self.iterations = iterations
+        self.gbest_prob = gbest_prob
+        self.pbest_prob = pbest_prob
+        self.particles = [Particle(data, *generate_ttp_solution(data.Dimension, data.ITEM, data.CAPACITY)) for _ in range(num_particles)]
+        self.gbest_particle = max(self.particles, key=lambda p: p.personal_best_score.net_profit)
+
+    def run(self):
+        for _ in range(self.iterations):
+            for particle in self.particles:
+                particle.clear_velocity()
+                particle.update_velocity(self.gbest_particle)
+                particle.apply_velocity()
+                particle.update_personal_best()
+
+                if particle.personal_best_score.net_profit > self.gbest_particle.personal_best_score.net_profit:
+                    self.gbest_particle = particle
+
+        return self.gbest_particle.personal_best_path, self.gbest_particle.personal_best_plan, self.gbest_particle.personal_best_score
