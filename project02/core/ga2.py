@@ -149,141 +149,141 @@ class Chromosome:
     phenome : Phenome
 
 
-class GA:
-    def __init__(self,problem_data : TTP, population_size, iterations, tour_size, mut_prob=1.0, cross_prob=1.0) -> None:
-        self.problem_data = problem_data
-        self.iterations = iterations
-        self.population_size = population_size
-        self.tour_size = tour_size
-        self.mut_prob = mut_prob
-        self.cross_prob = cross_prob
-        self.population = self.init_population()
-        # self.population = [Chromosome(*generate_ttp_solution(
-        #     problem_data.Dimension,problem_data.ITEM,problem_data.CAPACITY
-        # )) for _ in range(population_size)]
-        self.best_chromosome = sorted(self.population, key=lambda c: c.phenome.net_profit)[-1]
-        self.best_history = [self.best_chromosome.phenome.net_profit]
-        self.avg_history = [sum(c.phenome.net_profit for c in self.population) / len(self.population)]
-        self.time_execute = 0
+# class GA:
+#     def __init__(self,problem_data : TTP, population_size, iterations, tour_size, mut_prob=1.0, cross_prob=1.0) -> None:
+#         self.problem_data = problem_data
+#         self.iterations = iterations
+#         self.population_size = population_size
+#         self.tour_size = tour_size
+#         self.mut_prob = mut_prob
+#         self.cross_prob = cross_prob
+#         self.population = self.init_population()
+#         # self.population = [Chromosome(*generate_ttp_solution(
+#         #     problem_data.Dimension,problem_data.ITEM,problem_data.CAPACITY
+#         # )) for _ in range(population_size)]
+#         self.best_chromosome = sorted(self.population, key=lambda c: c.phenome.net_profit)[-1]
+#         self.best_history = [self.best_chromosome.phenome.net_profit]
+#         self.avg_history = [sum(c.phenome.net_profit for c in self.population) / len(self.population)]
+#         self.time_execute = 0
 
-    def init_population(self):
-        pop_temp = []
-        for _ in range(self.population_size):
-            path , plan = generate_ttp_solution(self.problem_data.Dimension,self.problem_data.ITEM,self.problem_data.CAPACITY)
-            time , profit = calculate_time_and_profit(path,plan,self.problem_data.NODE,self.problem_data.ITEM,self.problem_data.MIN_SPEED,self.problem_data.MAX_SPEED,self.problem_data.CAPACITY)
-            net_profit = profit - (time*self.problem_data.RENTING_RATIO)
-            phenome = Phenome(time,profit,net_profit)
-            chorm = Chromosome(path,plan,phenome)
-            pop_temp.append(chorm)
-        return pop_temp
+#     def init_population(self):
+#         pop_temp = []
+#         for _ in range(self.population_size):
+#             path , plan = generate_ttp_solution(self.problem_data.Dimension,self.problem_data.ITEM,self.problem_data.CAPACITY)
+#             time , profit = calculate_time_and_profit(path,plan,self.problem_data.NODE,self.problem_data.ITEM,self.problem_data.MIN_SPEED,self.problem_data.MAX_SPEED,self.problem_data.CAPACITY)
+#             net_profit = profit - (time*self.problem_data.RENTING_RATIO)
+#             phenome = Phenome(time,profit,net_profit)
+#             chorm = Chromosome(path,plan,phenome)
+#             pop_temp.append(chorm)
+#         return pop_temp
 
-    def run(self):
-        start = time.time()
-        for _ in range(self.iterations):
-            p1 = self.tournament_selection(self.population,self.tour_size)
-            p2 = self.tournament_selection(self.population,self.tour_size)
-            if np.random.rand() < self.cross_prob:
-                p1, p2 = self.ordered_crossover(p1,p2)
-            if np.random.rand() < self.mut_prob:
-                p1 = self.inversion_mutation(p1)
-                p2 = self.inversion_mutation(p2)
-            self.population = self.replace_weakest(self.population, p1)
-            self.population = self.replace_weakest(self.population, p2)
+#     def run(self):
+#         start = time.time()
+#         for _ in range(self.iterations):
+#             p1 = self.tournament_selection(self.population,self.tour_size)
+#             p2 = self.tournament_selection(self.population,self.tour_size)
+#             if np.random.rand() < self.cross_prob:
+#                 p1, p2 = self.ordered_crossover(p1,p2)
+#             if np.random.rand() < self.mut_prob:
+#                 p1 = self.inversion_mutation(p1)
+#                 p2 = self.inversion_mutation(p2)
+#             self.population = self.replace_weakest(self.population, p1)
+#             self.population = self.replace_weakest(self.population, p2)
 
-            current_best = sorted(self.population, key=lambda c: c.phenome.net_profit)[-1]
-            if current_best.phenome.net_profit > self.best_chromosome.phenome.net_profit:
-                self.best_chromosome = current_best
+#             current_best = sorted(self.population, key=lambda c: c.phenome.net_profit)[-1]
+#             if current_best.phenome.net_profit > self.best_chromosome.phenome.net_profit:
+#                 self.best_chromosome = current_best
             
-            self.best_history.append(self.best_chromosome.phenome.net_profit)
-            self.avg_history.append(sum(c.phenome.net_profit for c in self.population) / len(self.population))
-        end = time.time()
-        self.time_execute = end- start
-        return self.population , current_best
+#             self.best_history.append(self.best_chromosome.phenome.net_profit)
+#             self.avg_history.append(sum(c.phenome.net_profit for c in self.population) / len(self.population))
+#         end = time.time()
+#         self.time_execute = end- start
+#         return self.population , current_best
     
     
-    def ordered_crossover(self,parent1: Chromosome, parent2: Chromosome) -> Tuple[Chromosome, Chromosome]:
-        # Select crossover points for the path
-        start, end = sorted(np.random.choice(range(len(parent1.path)), 2))
+#     def ordered_crossover(self,parent1: Chromosome, parent2: Chromosome) -> Tuple[Chromosome, Chromosome]:
+#         # Select crossover points for the path
+#         start, end = sorted(np.random.choice(range(len(parent1.path)), 2))
 
-        # Create segments from parents
-        parent1_segment = parent1.path[start:end]
-        parent2_segment = parent2.path[start:end]
+#         # Create segments from parents
+#         parent1_segment = parent1.path[start:end]
+#         parent2_segment = parent2.path[start:end]
 
-        # Create offspring paths excluding parent segments
-        offspring1_path = [city for city in parent2.path if city not in parent1_segment]
-        offspring2_path = [city for city in parent1.path if city not in parent2_segment]
+#         # Create offspring paths excluding parent segments
+#         offspring1_path = [city for city in parent2.path if city not in parent1_segment]
+#         offspring2_path = [city for city in parent1.path if city not in parent2_segment]
 
-        # Insert parent segments into offspring paths
-        offspring1_path[start:start] = parent1_segment
-        offspring2_path[start:start] = parent2_segment
+#         # Insert parent segments into offspring paths
+#         offspring1_path[start:start] = parent1_segment
+#         offspring2_path[start:start] = parent2_segment
 
-        # For the plan, using a simple one-point crossover
-        crossover_point = np.random.randint(1, len(parent1.plan) - 1)
-        offspring1_plan = parent1.plan[:crossover_point] + parent2.plan[crossover_point:]
-        offspring2_plan = parent2.plan[:crossover_point] + parent1.plan[crossover_point:]
+#         # For the plan, using a simple one-point crossover
+#         crossover_point = np.random.randint(1, len(parent1.plan) - 1)
+#         offspring1_plan = parent1.plan[:crossover_point] + parent2.plan[crossover_point:]
+#         offspring2_plan = parent2.plan[:crossover_point] + parent1.plan[crossover_point:]
 
-        time1 , profit1 = calculate_time_and_profit(offspring1_path,offspring1_plan,self.problem_data.NODE,self.problem_data.ITEM,self.problem_data.MIN_SPEED,self.problem_data.MAX_SPEED,self.problem_data.CAPACITY)
-        net_profit1 = profit1 - (time1*self.problem_data.RENTING_RATIO)
-        phenome1 = Phenome(time1,profit1,net_profit1)
+#         time1 , profit1 = calculate_time_and_profit(offspring1_path,offspring1_plan,self.problem_data.NODE,self.problem_data.ITEM,self.problem_data.MIN_SPEED,self.problem_data.MAX_SPEED,self.problem_data.CAPACITY)
+#         net_profit1 = profit1 - (time1*self.problem_data.RENTING_RATIO)
+#         phenome1 = Phenome(time1,profit1,net_profit1)
 
-        time2 , profit2 = calculate_time_and_profit(offspring2_path,offspring2_plan,self.problem_data.NODE,self.problem_data.ITEM,self.problem_data.MIN_SPEED,self.problem_data.MAX_SPEED,self.problem_data.CAPACITY)
-        net_profit2 = profit2 - (time2*self.problem_data.RENTING_RATIO)
-        phenome2 = Phenome(time2,profit2,net_profit2)
+#         time2 , profit2 = calculate_time_and_profit(offspring2_path,offspring2_plan,self.problem_data.NODE,self.problem_data.ITEM,self.problem_data.MIN_SPEED,self.problem_data.MAX_SPEED,self.problem_data.CAPACITY)
+#         net_profit2 = profit2 - (time2*self.problem_data.RENTING_RATIO)
+#         phenome2 = Phenome(time2,profit2,net_profit2)
 
-        offspring1 = Chromosome(offspring1_path, offspring1_plan, phenome1)
-        offspring2 = Chromosome(offspring2_path, offspring2_plan, phenome2)       
+#         offspring1 = Chromosome(offspring1_path, offspring1_plan, phenome1)
+#         offspring2 = Chromosome(offspring2_path, offspring2_plan, phenome2)       
 
-        # # Create new Chromosome instances for offspring
-        # offspring1 = Chromosome(offspring1_path, offspring1_plan)
-        # offspring2 = Chromosome(offspring2_path, offspring2_plan)
+#         # # Create new Chromosome instances for offspring
+#         # offspring1 = Chromosome(offspring1_path, offspring1_plan)
+#         # offspring2 = Chromosome(offspring2_path, offspring2_plan)
 
-        return offspring1, offspring2
+#         return offspring1, offspring2
 
-    def inversion_mutation(self,chromosome: Chromosome):
-        # Ensure there are at least two elements in the path
-        if len(chromosome.path) < 2:
-            return chromosome
-        path = chromosome.path.copy()
-        plan = chromosome.plan.copy()
-        # Choose two distinct random positions in the path
-        pos1, pos2 = sorted(np.random.choice(range(len(chromosome.path)), 2))
+#     def inversion_mutation(self,chromosome: Chromosome):
+#         # Ensure there are at least two elements in the path
+#         if len(chromosome.path) < 2:
+#             return chromosome
+#         path = chromosome.path.copy()
+#         plan = chromosome.plan.copy()
+#         # Choose two distinct random positions in the path
+#         pos1, pos2 = sorted(np.random.choice(range(len(chromosome.path)), 2))
 
-        # Invert the order of elements between pos1 and pos2
-        path[pos1:pos2 + 1] = reversed(path[pos1:pos2 + 1])
-        plan[pos1:pos2 + 1] = reversed(plan[pos1:pos2 + 1])
+#         # Invert the order of elements between pos1 and pos2
+#         path[pos1:pos2 + 1] = reversed(path[pos1:pos2 + 1])
+#         plan[pos1:pos2 + 1] = reversed(plan[pos1:pos2 + 1])
 
-        new_time , new_profit = calculate_time_and_profit(path,plan,self.problem_data.NODE,self.problem_data.ITEM,self.problem_data.MIN_SPEED,self.problem_data.MAX_SPEED,self.problem_data.CAPACITY)
-        new_net_profit = new_profit - (new_time*self.problem_data.RENTING_RATIO)
-        phenome = Phenome(new_time,new_profit,new_net_profit)
+#         new_time , new_profit = calculate_time_and_profit(path,plan,self.problem_data.NODE,self.problem_data.ITEM,self.problem_data.MIN_SPEED,self.problem_data.MAX_SPEED,self.problem_data.CAPACITY)
+#         new_net_profit = new_profit - (new_time*self.problem_data.RENTING_RATIO)
+#         phenome = Phenome(new_time,new_profit,new_net_profit)
 
-        return Chromosome(path,plan,phenome)
+#         return Chromosome(path,plan,phenome)
 
-    def replace_weakest(self,population : List[Chromosome], candidates:Chromosome):
-        keys = [x.phenome.net_profit for x in population]
-        weakest_index = np.argmin(keys)
+#     def replace_weakest(self,population : List[Chromosome], candidates:Chromosome):
+#         keys = [x.phenome.net_profit for x in population]
+#         weakest_index = np.argmin(keys)
 
-        if candidates.phenome.net_profit > population[weakest_index].phenome.net_profit:
-            population[weakest_index] = candidates 
+#         if candidates.phenome.net_profit > population[weakest_index].phenome.net_profit:
+#             population[weakest_index] = candidates 
 
-        return population
-    def tournament_selection(self,population: List[int], tournament_size: int) -> Chromosome:
-        """
-        Selects a single Chromosome from the population using tournament selection.
+#         return population
+#     def tournament_selection(self,population: List[int], tournament_size: int) -> Chromosome:
+#         """
+#         Selects a single Chromosome from the population using tournament selection.
 
-        :param population: An instance of the Population class containing Chromosomes.
-        :param tournament_size: The number of Chromosomes to be selected for each tournament.
-        :return: The winning Chromosome with the highest net profit.
-        """
-        # Ensure the tournament size is not larger than the population size
-        tournament_size = min(tournament_size, len(population))
+#         :param population: An instance of the Population class containing Chromosomes.
+#         :param tournament_size: The number of Chromosomes to be selected for each tournament.
+#         :return: The winning Chromosome with the highest net profit.
+#         """
+#         # Ensure the tournament size is not larger than the population size
+#         tournament_size = min(tournament_size, len(population))
         
-        # Randomly select 'tournament_size' individuals from the population
-        tournament_contestants = np.random.choice(population, size=tournament_size, replace=False)
+#         # Randomly select 'tournament_size' individuals from the population
+#         tournament_contestants = np.random.choice(population, size=tournament_size, replace=False)
         
-        # Determine the winner based on the highest net profit
-        winner = max(tournament_contestants, key=lambda chromo: chromo.phenome.net_profit)
+#         # Determine the winner based on the highest net profit
+#         winner = max(tournament_contestants, key=lambda chromo: chromo.phenome.net_profit)
         
-        return winner
+#         return winner
 
 
 def two_opt_swap(path, i, k):
@@ -310,7 +310,7 @@ def apply_two_opt_local_search(path, node_data, min_speed, max_speed, capacity):
                 break  # Improvement found, exit outer loop
     return path
 
-class GA2:
+class GA:
     def __init__(self,problem_data : TTP, population_size, iterations, tour_size, mut_prob=1.0, cross_prob=1.0) -> None:
         self.problem_data = problem_data
         self.iterations = iterations

@@ -179,19 +179,26 @@ class Particle:
             self.personal_best_plan = self.plan.copy()
             self.personal_best_score = self.current_score
 
-    def update_velocity(self, global_best_particle):
-        # Simple velocity update logic (can be enhanced for better performance)
-        for i in range(len(self.path)):
-            if np.random.rand() < pbest_prob and self.path[i] != self.personal_best_path[i]:
-                self.velocity.append(('path', i, self.personal_best_path.index(self.path[i])))
-            if np.random.rand() < gbest_prob and self.path[i] != global_best_particle.path[i]:
-                self.velocity.append(('path', i, global_best_particle.path.index(self.path[i])))
-        
-        for i in range(len(self.plan)):
-            if np.random.rand() < pbest_prob and self.plan[i] != self.personal_best_plan[i]:
-                self.velocity.append(('plan', i, self.personal_best_plan.index(self.plan[i])))
-            if np.random.rand() < gbest_prob and self.plan[i] != global_best_particle.plan[i]:
-                self.velocity.append(('plan', i, global_best_particle.plan.index(self.plan[i])))
+    def update_velocity(self, global_best_particle, self_p, pbest_p, gbest_p):
+        rnd = np.random.rand()
+        if rnd < self_p:
+            self.apply_unary_operator()
+        elif rnd < self_p + pbest_p:
+            # Velocity update logic towards personal best
+            for i in range(len(self.path)):
+                if np.random.rand() < pbest_p and self.path[i] != self.personal_best_path[i]:
+                    self.velocity.append(('path', i, self.personal_best_path.index(self.path[i])))
+            for i in range(len(self.plan)):
+                if np.random.rand() < pbest_p and self.plan[i] != self.personal_best_plan[i]:
+                    self.velocity.append(('plan', i, self.personal_best_plan.index(self.plan[i])))
+        else:
+            # Velocity update logic towards global best
+            for i in range(len(self.path)):
+                if np.random.rand() < gbest_p and self.path[i] != global_best_particle.path[i]:
+                    self.velocity.append(('path', i, global_best_particle.path.index(self.path[i])))
+            for i in range(len(self.plan)):
+                if np.random.rand() < gbest_p and self.plan[i] != global_best_particle.plan[i]:
+                    self.velocity.append(('plan', i, global_best_particle.plan.index(self.plan[i])))
 
     def apply_velocity(self):
         for change in self.velocity:
@@ -214,18 +221,27 @@ class Particle:
             idx = np.random.randint(0, len(self.path) - 1)
             self.path[idx], self.path[idx + 1] = self.path[idx + 1], self.path[idx]
 
+    def reverse_subsection_path(self):
+        if len(self.path) > 2:
+            start, end = sorted(np.random.choice(len(self.path), 2, replace=False))
+            self.path[start:end+1] = reversed(self.path[start:end+1])
+    
     def apply_unary_operator(self):
         if np.random.rand() < 0.7:
             self.swap_adjacent_cities()
+        else:
+            self.reverse_subsection_path()
         if np.random.rand() < 0.55:
             flip_count = np.random.randint(1, len(self.plan)+1)  # Random number of items to flip
             self.flip_multiple_items(flip_count)
 
+
 class PSO:
-    def __init__(self, data, num_particles, iterations, gbest_prob=1.0, pbest_prob=1.0):
+    def __init__(self, data, num_particles, iterations, gbest_prob=0.05, pbest_prob=0.05, self_prob=0.90):
         self.data = data
         self.num_particles = num_particles
         self.iterations = iterations
+        self.self_prob = self_prob
         self.gbest_prob = gbest_prob
         self.pbest_prob = pbest_prob
         self.particles = [Particle(data, *generate_ttp_solution(data.Dimension, data.ITEM, data.CAPACITY)) for _ in range(num_particles)]
@@ -233,9 +249,10 @@ class PSO:
 
     def run(self):
         for _ in range(self.iterations):
+            self.update_probabilities()
             for particle in self.particles:
                 particle.clear_velocity()
-                particle.update_velocity(self.gbest_particle)
+                particle.update_velocity(self.gbest_particle, self.self_prob, self.pbest_prob, self.gbest_prob)
                 particle.apply_velocity()
                 particle.update_personal_best()
 
@@ -243,3 +260,9 @@ class PSO:
                     self.gbest_particle = particle
 
         return self.gbest_particle.personal_best_path, self.gbest_particle.personal_best_plan, self.gbest_particle.personal_best_score
+
+    def update_probabilities(self):
+        # Update the probabilities as per the paper's recommendation
+        self.self_prob *= 0.95
+        self.pbest_prob *= 1.01
+        self.gbest_prob = 1 - (self.self_prob + self.pbest_prob)
