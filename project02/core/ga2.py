@@ -383,7 +383,7 @@ class GA:
         offspring1_plan = parent1.plan[:crossover_point] + parent2.plan[crossover_point:]
         offspring2_plan = parent2.plan[:crossover_point] + parent1.plan[crossover_point:]
         
-        offspring1_path = apply_two_opt_local_search(offspring1_path, self.problem_data.NODE, self.problem_data.MIN_SPEED, self.problem_data.MAX_SPEED, self.problem_data.CAPACITY)
+        offspring1_path =   (offspring1_path, self.problem_data.NODE, self.problem_data.MIN_SPEED, self.problem_data.MAX_SPEED, self.problem_data.CAPACITY)
         offspring2_path = apply_two_opt_local_search(offspring2_path, self.problem_data.NODE, self.problem_data.MIN_SPEED, self.problem_data.MAX_SPEED, self.problem_data.CAPACITY)
 
         time1 , profit1 = calculate_time_and_profit(offspring1_path,offspring1_plan,self.problem_data.NODE,self.problem_data.ITEM,self.problem_data.MIN_SPEED,self.problem_data.MAX_SPEED,self.problem_data.CAPACITY)
